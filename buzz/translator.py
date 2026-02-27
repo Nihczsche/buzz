@@ -76,7 +76,8 @@ class Translator(QObject):
             return completion.choices[0].message.content, transcript_id
         else:
             logging.error(f"Translation error! Server response: {completion}")
-            return _("Translation error, see logs!"), transcript_id
+            # Translation error
+            return "", transcript_id
 
     def _translate_batch(self, items: List[Tuple[str, int]]) -> List[Tuple[str, int]]:
         """Translate multiple transcripts in a single API call.
@@ -109,7 +110,8 @@ class Translator(QObject):
 
         if not (completion and completion.choices and completion.choices[0].message):
             logging.error(f"Batch translation error! Server response: {completion}")
-            return [(_("Translation error, see logs!"), tid) for _, tid in items]
+            # Translation error
+            return [("", tid) for _, tid in items]
 
         response_text = completion.choices[0].message.content
         logging.debug(f"Received batch translation response: {response_text}")
@@ -121,7 +123,8 @@ class Translator(QObject):
             if i < len(translations):
                 results.append((translations[i], transcript_id))
             else:
-                results.append((_("Translation error, see logs!"), transcript_id))
+                # Translation error
+                results.append(("", transcript_id))
         return results
 
     @staticmethod
@@ -137,7 +140,7 @@ class Translator(QObject):
             translations[num] = text
 
         return [
-            translations.get(i, _("Translation error, see logs!"))
+            translations.get(i, "")
             for i in range(1, expected_count + 1)
         ]
 
