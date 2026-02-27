@@ -49,6 +49,8 @@ class Settings:
         OPENAI_API_MODEL = "transcriber/openai-api-model"
         CUSTOM_FASTER_WHISPER_ID = "transcriber/custom-faster-whisper-id"
         HUGGINGFACE_MODEL_ID = "transcriber/huggingface-model-id"
+        CUSTOM_SPEECHMATICS_URL = "transcriber/custom-speechmatics-url"
+        SPEECHMATICS_API_KEY = "transcriber/speechmatics-api-key"
 
         SHORTCUTS = "shortcuts"
 

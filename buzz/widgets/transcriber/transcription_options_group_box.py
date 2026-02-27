@@ -3,9 +3,9 @@ import logging
 import platform
 from typing import Optional, List
 
-from PyQt6.QtCore import pyqtSignal, QLocale
+from PyQt6.QtCore import pyqtSignal, Qt, QLocale
 from PyQt6.QtGui import QIcon
-from PyQt6.QtWidgets import QGroupBox, QWidget, QFormLayout, QComboBox, QLabel, QHBoxLayout
+from PyQt6.QtWidgets import QGroupBox, QWidget, QFormLayout, QComboBox, QLabel, QHBoxLayout, QLineEdit, QCheckBox
 
 from buzz.locale import _
 from buzz.settings.settings import Settings
@@ -98,6 +98,31 @@ class TranscriptionOptionsGroupBox(QGroupBox):
         self.mms_language_line_edit.languageChanged.connect(self.on_mms_language_changed)
         self.mms_language_line_edit.setVisible(False)
 
+        # Speechmatics API key field
+        speechmatics_api_key = self.settings.value(
+            Settings.Key.SPEECHMATICS_API_KEY, default_value=""
+        )
+        # Pre-populate from settings if present, or from passed-in options
+        if speechmatics_api_key:
+            self.transcription_options.speechmatics_access_token = speechmatics_api_key
+        self.speechmatics_api_key_edit = QLineEdit(self)
+        self.speechmatics_api_key_edit.setPlaceholderText(_("Enter Speechmatics API key"))
+        self.speechmatics_api_key_edit.setEchoMode(QLineEdit.EchoMode.Password)
+        self.speechmatics_api_key_edit.setText(
+            self.transcription_options.speechmatics_access_token
+        )
+        self.speechmatics_api_key_edit.textChanged.connect(
+            self.on_speechmatics_api_key_changed
+        )
+
+        self.identify_speaker_checkbox = QCheckBox(
+            "Identify Speaker", parent=self
+        )
+        self.identify_speaker_checkbox.setChecked(self.transcription_options.identify_speaker)
+        self.identify_speaker_checkbox.stateChanged.connect(
+            self.on_identify_speaker_changed
+        )
+
         self.advanced_settings_button = AdvancedSettingsButton(self)
         self.advanced_settings_button.clicked.connect(self.open_advanced_settings)
 
@@ -127,6 +152,8 @@ class TranscriptionOptionsGroupBox(QGroupBox):
         self.form_layout.addRow(_("Task:"), self.tasks_combo_box)
         self.form_layout.addRow(_("Language:"), self.languages_combo_box)
         self.form_layout.addRow(_("Language:"), self.mms_language_line_edit)
+        self.form_layout.addRow(_("Api Key:"), self.speechmatics_api_key_edit)
+        self.form_layout.addRow("", self.identify_speaker_checkbox)
 
         self.reset_visible_rows()
 
@@ -136,6 +163,15 @@ class TranscriptionOptionsGroupBox(QGroupBox):
 
     def on_openai_access_token_edit_changed(self, access_token: str):
         self.transcription_options.openai_access_token = access_token
+        self.transcription_options_changed.emit(self.transcription_options)
+
+    def on_speechmatics_api_key_changed(self, api_key: str):
+        self.transcription_options.speechmatics_access_token = api_key
+        self.settings.set_value(Settings.Key.SPEECHMATICS_API_KEY, api_key)
+        self.transcription_options_changed.emit(self.transcription_options)
+
+    def on_identify_speaker_changed(self, state: int):
+        self.transcription_options.identify_speaker = state == Qt.CheckState.Checked.value
         self.transcription_options_changed.emit(self.transcription_options)
 
     def on_language_changed(self, language: str):
@@ -241,6 +277,20 @@ class TranscriptionOptionsGroupBox(QGroupBox):
 
         self.form_layout.setRowVisible(
             self.openai_access_token_edit, model_type == ModelType.OPEN_AI_WHISPER_API
+        )
+
+        self.form_layout.setRowVisible(
+            self.speechmatics_api_key_edit, model_type == ModelType.SPEECHMATICS
+        )
+
+        self.form_layout.setRowVisible(
+            self.identify_speaker_checkbox, model_type == ModelType.SPEECHMATICS
+        )
+
+        # Hide task/model-size controls for Speechmatics (cloud handles it)
+        self.form_layout.setRowVisible(
+            self.tasks_combo_box,
+            model_type != ModelType.SPEECHMATICS,
         )
 
         # Note on Apple Silicon Macs
