@@ -162,7 +162,7 @@ class ModelType(enum.Enum):
     HUGGING_FACE = "Hugging Face"
     FASTER_WHISPER = "Faster Whisper"
     OPEN_AI_WHISPER_API = "OpenAI Whisper API"
-    SPEECHMATICS = "Speechmatics"
+    SPEECHMATICS = "Speechmatics API"
 
     @property
     def supports_initial_prompt(self):
@@ -309,7 +309,7 @@ class TranscriptionModel:
             case ModelType.OPEN_AI_WHISPER_API:
                 return "OpenAI Whisper API"
             case ModelType.SPEECHMATICS:
-                return "Speechmatics"
+                return "Speechmatics API"
             case _:
                 raise Exception("Unknown model type")
 
