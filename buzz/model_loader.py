@@ -162,6 +162,7 @@ class ModelType(enum.Enum):
     HUGGING_FACE = "Hugging Face"
     FASTER_WHISPER = "Faster Whisper"
     OPEN_AI_WHISPER_API = "OpenAI Whisper API"
+    SPEECHMATICS = "Speechmatics API"
 
     @property
     def supports_initial_prompt(self):
@@ -170,7 +171,7 @@ class ModelType(enum.Enum):
             ModelType.WHISPER_CPP,
             ModelType.OPEN_AI_WHISPER_API,
             ModelType.FASTER_WHISPER,
-        )
+        )  # SPEECHMATICS does not use an initial prompt
 
     def is_available(self):
         if (
@@ -187,7 +188,7 @@ class ModelType(enum.Enum):
             ModelType.WHISPER,
             ModelType.WHISPER_CPP,
             ModelType.FASTER_WHISPER,
-        )
+        )  # SPEECHMATICS is cloud-only, no local model
 
 
 HUGGING_FACE_MODEL_ALLOW_PATTERNS = [
@@ -307,6 +308,8 @@ class TranscriptionModel:
                 return f"Faster Whisper ({self.whisper_model_size})"
             case ModelType.OPEN_AI_WHISPER_API:
                 return "OpenAI Whisper API"
+            case ModelType.SPEECHMATICS:
+                return "Speechmatics API"
             case _:
                 raise Exception("Unknown model type")
 
@@ -423,6 +426,9 @@ class TranscriptionModel:
 
         if self.model_type == ModelType.OPEN_AI_WHISPER_API:
             return ""
+
+        if self.model_type == ModelType.SPEECHMATICS:
+            return ""  # Cloud-only; no local model path needed
 
         if self.model_type == ModelType.HUGGING_FACE:
             try:
@@ -778,6 +784,10 @@ class ModelDownloader(QRunnable):
 
         if self.model.model_type == ModelType.OPEN_AI_WHISPER_API:
             self.signals.finished.emit("")
+            return
+
+        if self.model.model_type == ModelType.SPEECHMATICS:
+            self.signals.finished.emit("")  # Cloud-only; no local model to download
             return
 
         raise Exception("Invalid model type: " + self.model.model_type.value)
