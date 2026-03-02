@@ -115,10 +115,9 @@ class TranscriptionOptionsGroupBox(QGroupBox):
             self.on_speechmatics_api_key_changed
         )
 
-        self.identify_speaker_checkbox = QCheckBox(
-            "Identify Speaker", parent=self
-        )
+        self.identify_speaker_checkbox = QCheckBox(_("Identify Speaker"))
         self.identify_speaker_checkbox.setChecked(self.transcription_options.identify_speaker)
+        self.identify_speaker_checkbox.setObjectName("IdentifySpeakerCheckbox")
         self.identify_speaker_checkbox.stateChanged.connect(
             self.on_identify_speaker_changed
         )
@@ -171,7 +170,7 @@ class TranscriptionOptionsGroupBox(QGroupBox):
         self.transcription_options_changed.emit(self.transcription_options)
 
     def on_identify_speaker_changed(self, state: int):
-        self.transcription_options.identify_speaker = state == Qt.CheckState.Checked.value
+        self.transcription_options.identify_speaker = (state == Qt.CheckState.Checked.value)
         self.transcription_options_changed.emit(self.transcription_options)
 
     def on_language_changed(self, language: str):

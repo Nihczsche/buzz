@@ -62,12 +62,12 @@ class SpeechmaticsFileTranscriber(FileTranscriber):
         ) as client:
             config = JobConfig(
                 type=JobType.TRANSCRIPTION,
-                transcription_config=TranscriptionConfig(language=language),
+                transcription_config=TranscriptionConfig(language=language, diarization="speaker"),
             )
 
             logging.debug("Submitting Speechmatics job for file: %s", file_path)
             job = await client.submit_job(file_path, config=config)
-            logging.debug("Speechmatics job submitted: id=%s", job.id)
+            logging.debug("Speechmatics job submitted: id=%s identify_speaker=%s", job.id, identify_speaker)
 
             self.progress.emit((10, 100))
 
