@@ -150,6 +150,10 @@ class TranscriptionOptions:
     openai_access_token: str = field(
         default="", metadata=config(exclude=Exclude.ALWAYS)
     )
+    speechmatics_access_token: str = field(
+        default="", metadata=config(exclude=Exclude.ALWAYS)
+    )
+    identify_speaker: bool = False
     enable_llm_translation: bool = False
     llm_prompt: str = ""
     llm_model: str = ""

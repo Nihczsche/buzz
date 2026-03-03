@@ -16,12 +16,14 @@ class TestModelTypeComboBox:
                     "Hugging Face",
                     "Faster Whisper",
                     "OpenAI Whisper API",
+                    "Speechmatics API",
                     # Faster Whisper is not available on macOS x86_64
                 ] if not (platform.system() == "Darwin" and platform.machine() == "x86_64") else [
                     "Whisper",
                     "Whisper.cpp",
                     "Hugging Face",
                     "OpenAI Whisper API",
+                    "Speechmatics API",
                 ],
             ),
         ],

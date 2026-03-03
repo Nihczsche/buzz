@@ -59,6 +59,7 @@ from buzz.transcriber.file_transcriber import FileTranscriber
 from buzz.transcriber.openai_whisper_api_file_transcriber import (
     OpenAIWhisperAPIFileTranscriber,
 )
+from buzz.transcriber.speechmatics_file_transcriber import SpeechmaticsFileTranscriber
 from buzz.transcriber.transcriber import FileTranscriptionTask, Segment
 from buzz.transcriber.whisper_file_transcriber import WhisperFileTranscriber
 
@@ -171,6 +172,10 @@ class FileTranscriberQueueWorker(QObject):
         model_type = self.current_task.transcription_options.model.model_type
         if model_type == ModelType.OPEN_AI_WHISPER_API:
             self.current_transcriber = OpenAIWhisperAPIFileTranscriber(
+                task=self.current_task
+            )
+        elif model_type == ModelType.SPEECHMATICS:
+            self.current_transcriber = SpeechmaticsFileTranscriber(
                 task=self.current_task
             )
         elif (
