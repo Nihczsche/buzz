@@ -62,7 +62,10 @@ class SpeechmaticsFileTranscriber(FileTranscriber):
         ) as client:
             config = JobConfig(
                 type=JobType.TRANSCRIPTION,
-                transcription_config=TranscriptionConfig(language=language, diarization="speaker"),
+                transcription_config=TranscriptionConfig(
+                    language=language,
+                    diarization="speaker" if identify_speaker else "none",
+                ),
             )
 
             logging.debug("Submitting Speechmatics job for file: %s", file_path)
